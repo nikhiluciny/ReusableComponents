@@ -1,0 +1,100 @@
+:host {
+  /* Define your color palette here for easy management */
+  --path-color-current: #43285D;
+  --path-color-complete: #8B7FA0;
+  --path-color-incomplete: #D3D5E3;
+  /* Text colors for readability against the backgrounds */
+  --text-color-on-dark: #FFFFFF;
+  --text-color-on-light: #181818;
+}
+
+/* --- Update Button Styling --- */
+.slds-button_brand {
+  background-color: var(--path-color-current);
+  border-color: var(--path-color-current);
+  color: var(--text-color-on-dark);
+}
+.slds-button_brand:hover,
+.slds-button_brand:focus {
+  background-color: #331e4a;
+  border-color: #331e4a;
+}
+
+/* --- Path Step Styling (Color Logic) --- */
+/* == 1. CURRENT / ACTIVE STEP == */
+.slds-path__item.slds-is-current .slds-path__link,
+.slds-path__item.slds-is-active .slds-path__link {
+  background-color: var(--path-color-current);
+  color: var(--text-color-on-dark);
+}
+.slds-path__item.slds-is-current::before,
+.slds-path__item.slds-is-current::after,
+.slds-path__item.slds-is-active::before,
+.slds-path__item.slds-is-active::after {
+  background: var(--path-color-current);
+}
+
+/* == 2. COMPLETE STEPS == */
+.slds-path__item.slds-is-complete .slds-path__link,
+.slds-path__item.slds-is-won .slds-path__link {
+  background-color: var(--path-color-complete);
+  color: var(--text-color-on-dark);
+}
+.slds-path__item.slds-is-complete::before,
+.slds-path__item.slds-is-complete::after,
+.slds-path__item.slds-is-won::before,
+.slds-path__item.slds-is-won::after {
+  background: var(--path-color-complete);
+}
+.slds-path__nav .slds-is-complete .slds-path__link {
+  --slds-c-icon-color-foreground: #43285D;
+  
+}
+
+/* == 3. INCOMPLETE STEPS == */
+.slds-path__item.slds-is-incomplete .slds-path__link {
+  background-color: var(--path-color-incomplete);
+  color: var(--text-color-on-light);
+}
+.slds-path__item.slds-is-incomplete::before,
+.slds-path__item.slds-is-incomplete::after {
+  background: var(--path-color-incomplete);
+}
+
+/* --- Path End Cap Styling (Rounded Ends & Incomplete Color for First/Last Child) --- */
+.slds-path__item:first-child {
+  margin-inline-start: 0;
+  border-start-start-radius: 2rem;
+  border-end-start-radius: 2rem;
+  padding-inline-start: 0.0001rem;
+  background: var(--path-color-incomplete);
+}
+.slds-path__item:first-child .slds-path__link {
+  border-start-start-radius: 2rem;
+  border-end-start-radius: 2rem;
+  padding-inline-start: 0.0001rem;
+  
+  color: var(--text-color-on-dark);
+}
+.slds-path__item:last-child {
+  margin-inline-end: 0;
+  border-start-end-radius: 2rem;
+  border-end-end-radius: 2rem;
+  padding-inline-end: 0.001rem;
+  background: var(--path-color-incomplete);
+}
+.slds-path__item:last-child .slds-path__link {
+  border-start-end-radius: 2rem;
+  border-end-end-radius: 2rem;
+  padding-inline-end: 0.0001rem;
+  
+  
+}
+
+/* --- SLDS Path Nav Overrides --- */
+.slds-path__nav .slds-is-complete {
+  background: var(--path-color-complete);
+}
+.slds-path__nav .slds-is-incomplete {
+  background: var(--path-color-incomplete);
+}

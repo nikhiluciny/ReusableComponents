@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata" fqn="pathAssistant">
+    <apiVersion>60.0</apiVersion>
+    <isExposed>true</isExposed>
+    <masterLabel>Path Assistant (Plan)</masterLabel>
+    <description>Custom path assistant. Provides closed steps feature (no final popup)</description>
+
+    <targets>
+        <target>lightning__RecordPage</target>
+    </targets>
+
+    <targetConfigs>
+        <targetConfig targets="lightning__RecordPage">
+            <objects>
+                <object>Plan__c</object>
+            </objects>
+
+            <property name="picklistField"
+                      label="Picklist Field"
+                      type="String"
+                      description="Picklist field's API name used to render the path. This field must be on the page layout."
+                      default="Status__c"
+                      required="true"/>
+
+            <property name="closedOk"
+                      label="Closed OK step"
+                      type="String"
+                      description="Terminal OK value (green)."
+                      default="Workplan Active"
+                      required="true"/>
+
+            <!-- KO optional; final action always sets closedOk -->
+            <property name="closedKo"
+                      label="Closed KO step"
+                      type="String"
+                      description="Optional terminal Not-OK value (red)."
+                      required="false"/>
+
+            <property name="lastStepLabel"
+                      label="Label of final step"
+                      type="String"
+                      description="Shown for the final action (clicking it marks status as closed OK)."
+                      default="Mark Workplan Status as Complete"
+                      required="true"/>
+
+            <property name="hideUpdateButton"
+                      label="Hide update button"
+                      type="Boolean"
+                      default="false"/>
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>
