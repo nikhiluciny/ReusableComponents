@@ -47,7 +47,7 @@
   background: var(--path-color-complete);
 }
 .slds-path__nav .slds-is-complete .slds-path__link {
-  --slds-c-icon-color-foreground: #43285D;
+  --slds-c-icon-color-foreground: #FFFFFF;
   
 }
 
