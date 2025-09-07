@@ -4,6 +4,8 @@
  * - Field-name normalization (accepts 'Plan__c.Status__c' or 'Status__c')
  * - Default Record Type fallback for App Builder
  * - NO POPUP for final step: clicking final step immediately sets closedOk
+ * - Hover preview highlighting for incomplete steps
+ * - NEW: Selected (pending) step uses #8B7FA0 (class: slds-is-selected)
  */
 import { LightningElement, api, wire } from 'lwc';
 import { getObjectInfo, getPicklistValuesByRecordType } from 'lightning/uiObjectInfoApi';
@@ -40,6 +42,9 @@ export default class PathAssistant extends LightningElement {
     selectedStepValue;
     _recordTypeId;
     _currentScenario;
+
+    // hover preview index
+    hoverIndex = null;
 
     // labels (could be custom labels)
     labels = {
@@ -171,13 +176,32 @@ export default class PathAssistant extends LightningElement {
         }
     }
 
+    _isPreview(step) {
+        // Only preview future (incomplete) steps when hovering
+        if (this.hoverIndex == null) return false;
+        const stepIndex = step.index;
+        const currentIndex = this.currentStep?.index ?? -1;
+        return stepIndex > currentIndex && stepIndex <= this.hoverIndex;
+    }
+
     _getStepElementCssClass(step) {
         let classText = 'slds-path__item';
 
         if (step.equals(this.closedOk)) classText += ' slds-is-won';
         if (this.closedKo && step.equals(this.closedKo)) classText += ' slds-is-lost';
 
-        if (step.equals(this.selectedStepValue)) classText += ' slds-is-active';
+        // NEW: pending selection should NOT use slds-is-active (reserved for current step visual).
+        // Use a custom class we can style to #8B7FA0.
+        const isSelectedPending =
+            this.selectedStepValue &&
+            step.equals(this.selectedStepValue) &&
+            !step.equals(this.currentStep) &&
+            !step.equals(this.closedOk) &&
+            !(this.closedKo && step.equals(this.closedKo));
+
+        if (isSelectedPending) {
+            classText += ' slds-is-selected';
+        }
 
         if (step.equals(this.currentStep)) {
             classText += ' slds-is-current';
@@ -187,6 +211,12 @@ export default class PathAssistant extends LightningElement {
         } else {
             classText += ' slds-is-incomplete';
         }
+
+        // Add preview state (range from current -> hovered)
+        if (this._isPreview(step)) {
+            classText += ' slds-is-preview';
+        }
+
         return classText;
     }
 
@@ -194,6 +224,7 @@ export default class PathAssistant extends LightningElement {
         this.record = undefined;
         this.selectedStepValue = undefined;
         this._currentScenario = undefined;
+        this.hoverIndex = null; // clear preview on refresh
     }
 
     _updateRecord(stepValue) {
@@ -257,7 +288,6 @@ export default class PathAssistant extends LightningElement {
             lastStep = closedKoElem;
         } else {
             // final action: immediately set closedOk (no popup)
-
             const finalLabel = (closedOkElem && closedOkElem.label) || this.closedOk || this.lastStepLabel;
             lastStep = new Step(
                 OPEN_MODAL_TO_SELECT_CLOSED_STEP,
@@ -331,7 +361,7 @@ export default class PathAssistant extends LightningElement {
     handleStepSelected(event) {
         const val = event.currentTarget.getAttribute('data-value');
 
-        // NEW: clicking the final step immediately marks as closedOk (no popup)
+        // Clicking the final step immediately marks as closedOk (no popup)
         if (val === OPEN_MODAL_TO_SELECT_CLOSED_STEP) {
             this._updateRecord(this.closedOk);
             return;
@@ -370,5 +400,27 @@ export default class PathAssistant extends LightningElement {
             default:
                 break;
         }
+    }
+
+    // Hover preview handlers
+    handleStepHoverEnter(event) {
+        const idxStr = event.currentTarget?.dataset?.index;
+        if (idxStr == null) {
+            this.hoverIndex = null;
+            return;
+        }
+        const idx = Number(idxStr); // supports "Infinity"
+        const currentIdx = this.currentStep?.index ?? -1;
+
+        // Only preview future (incomplete) steps
+        if (Number.isFinite(idx) || idx === Infinity) {
+            this.hoverIndex = idx > currentIdx ? idx : null;
+        } else {
+            this.hoverIndex = null;
+        }
+    }
+
+    handleStepHoverLeave() {
+        this.hoverIndex = null;
     }
 }
