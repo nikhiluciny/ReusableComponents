@@ -1,18 +1,122 @@
 :host {
-  /* Define your color palette here for easy management */
-  --path-color-current: #43285D;
-  --path-color-complete: #8B7FA0;
+  /* Palette */
+  --path-color-current:    #43285D;  /* current step */
+  --path-color-complete:   #8B7FA0;  /* also used for selected */
   --path-color-incomplete: #D3D5E3;
-  /* Text colors for readability against the backgrounds */
-  --text-color-on-dark: #FFFFFF;
-  --text-color-on-light: #181818;
+  --path-color-hover:      #8B7FA0;  /* EXACT hover color */
+
+  /* Text */
+  --fg-dark:  #FFFFFF;
+  --fg-light: #181818;
 }
 
-/* --- Update Button Styling --- */
+/* Make the link transparent so the <li> controls ALL coloring */
+.slds-path__link {
+  background-color: transparent !important;
+  transition: color .15s ease, box-shadow .15s ease;
+}
+
+/* Unify color: drive the stage color from the <li> and its chevrons */
+.slds-path__item,
+.slds-path__item::before,
+.slds-path__item::after {
+  background-color: var(--stage-bg, var(--path-color-incomplete));
+  transition: background-color .15s ease;
+}
+
+/* Text + icon colors follow the same variables */
+.slds-path__item .slds-path__link,
+.slds-path__item .slds-path__title {
+  color: var(--stage-fg, var(--fg-light));
+  transition: color .15s ease;
+}
+.slds-path__item {
+  --slds-c-icon-color-foreground: var(--icon-fg, var(--fg-light));
+}
+
+/* ================== STATES (set variables only) ================== */
+
+/* Current / Active */
+.slds-path__item.slds-is-current,
+.slds-path__item.slds-is-active {
+  --stage-bg: var(--path-color-current);
+  --stage-fg: var(--fg-dark);
+  --icon-fg:  #FFFFFF;
+}
+
+/* Complete / Won (already passed) */
+.slds-path__item.slds-is-complete,
+.slds-path__item.slds-is-won {
+  --stage-bg: var(--path-color-complete);
+  --stage-fg: var(--fg-dark);
+  --icon-fg:  #FFFFFF;
+}
+
+/* Incomplete (base) */
+.slds-path__item.slds-is-incomplete {
+  --stage-bg: var(--path-color-incomplete);
+  --stage-fg: var(--fg-light);
+  --icon-fg:  var(--fg-light);
+}
+
+/* Hover ANY incomplete step -> unified hover color on whole stage (EXACT #8B7FA0) */
+.slds-path__item.slds-is-incomplete:hover,
+.slds-path__item.slds-is-preview {
+  --stage-bg: var(--path-color-hover);
+  --stage-fg: #FFFFFF;
+  --icon-fg: #FFFFFF;
+}
+/* Neutralize SLDS link hover effects */
+.slds-path__item.slds-is-incomplete:hover .slds-path__link,
+.slds-path__item.slds-is-preview .slds-path__link {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+/* Belt & suspenders: directly paint the li + chevrons on hover/preview */
+.slds-path__item.slds-is-incomplete:hover,
+.slds-path__item.slds-is-incomplete:hover::before,
+.slds-path__item.slds-is-incomplete:hover::after,
+.slds-path__item.slds-is-preview::before,
+.slds-path__item.slds-is-preview::after {
+  background-color: #8B7FA0 !important;
+}
+
+/* NEW: Hover ANY completed/won (passed) step -> EXACT #8B7FA0 too */
+.slds-path__item.slds-is-complete:hover,
+.slds-path__item.slds-is-won:hover {
+  --stage-bg: var(--path-color-hover);
+  --stage-fg: #FFFFFF;
+  --icon-fg: #FFFFFF;
+}
+.slds-path__item.slds-is-complete:hover .slds-path__link,
+.slds-path__item.slds-is-won:hover .slds-path__link {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+/* Belt & suspenders: hard paint for passed steps on hover */
+.slds-path__item.slds-is-complete:hover,
+.slds-path__item.slds-is-complete:hover::before,
+.slds-path__item.slds-is-complete:hover::after,
+.slds-path__item.slds-is-won:hover,
+.slds-path__item.slds-is-won:hover::before,
+.slds-path__item.slds-is-won:hover::after {
+  background-color: #8B7FA0 !important;
+}
+
+/* Selected (clicked but not saved yet) -> same color as hover (#8B7FA0) */
+.slds-path__item.slds-is-selected {
+  --stage-bg: var(--path-color-complete);
+  --stage-fg: #FFFFFF;
+  --icon-fg: #FFFFFF;
+}
+
+/* ================== Niceties & shape rounding ================== */
+
+/* Buttons (unchanged) */
 .slds-button_brand {
   background-color: var(--path-color-current);
   border-color: var(--path-color-current);
-  color: var(--text-color-on-dark);
+  color: var(--fg-dark);
 }
 .slds-button_brand:hover,
 .slds-button_brand:focus {
@@ -20,81 +124,21 @@
   border-color: #331e4a;
 }
 
-/* --- Path Step Styling (Color Logic) --- */
-/* == 1. CURRENT / ACTIVE STEP == */
-.slds-path__item.slds-is-current .slds-path__link,
-.slds-path__item.slds-is-active .slds-path__link {
-  background-color: var(--path-color-current);
-  color: var(--text-color-on-dark);
-}
-.slds-path__item.slds-is-current::before,
-.slds-path__item.slds-is-current::after,
-.slds-path__item.slds-is-active::before,
-.slds-path__item.slds-is-active::after {
-  background: var(--path-color-current);
-}
+/* Pointer for interactive steps */
+.slds-path__item .slds-path__link { cursor: pointer; }
 
-/* == 2. COMPLETE STEPS == */
-.slds-path__item.slds-is-complete .slds-path__link,
-.slds-path__item.slds-is-won .slds-path__link {
-  background-color: var(--path-color-complete);
-  color: var(--text-color-on-dark);
-}
-.slds-path__item.slds-is-complete::before,
-.slds-path__item.slds-is-complete::after,
-.slds-path__item.slds-is-won::before,
-.slds-path__item.slds-is-won::after {
-  background: var(--path-color-complete);
-}
-.slds-path__nav .slds-is-complete .slds-path__link {
-  --slds-c-icon-color-foreground: #FFFFFF;
-  
-}
-
-/* == 3. INCOMPLETE STEPS == */
-.slds-path__item.slds-is-incomplete .slds-path__link {
-  background-color: var(--path-color-incomplete);
-  color: var(--text-color-on-light);
-}
-.slds-path__item.slds-is-incomplete::before,
-.slds-path__item.slds-is-incomplete::after {
-  background: var(--path-color-incomplete);
-}
-
-/* --- Path End Cap Styling (Rounded Ends & Incomplete Color for First/Last Child) --- */
+/* End-cap rounding on the <li> so caps match the stage color */
 .slds-path__item:first-child {
-  margin-inline-start: 0;
   border-start-start-radius: 2rem;
   border-end-start-radius: 2rem;
-  padding-inline-start: 0.0001rem;
-  background: var(--path-color-incomplete);
-}
-.slds-path__item:first-child .slds-path__link {
-  border-start-start-radius: 2rem;
-  border-end-start-radius: 2rem;
-  padding-inline-start: 0.0001rem;
-  
-  color: var(--text-color-on-dark);
 }
 .slds-path__item:last-child {
-  margin-inline-end: 0;
   border-start-end-radius: 2rem;
   border-end-end-radius: 2rem;
-  padding-inline-end: 0.001rem;
-  background: var(--path-color-incomplete);
-}
-.slds-path__item:last-child .slds-path__link {
-  border-start-end-radius: 2rem;
-  border-end-end-radius: 2rem;
-  padding-inline-end: 0.0001rem;
-  
-  
 }
 
-/* --- SLDS Path Nav Overrides --- */
-.slds-path__nav .slds-is-complete {
-  background: var(--path-color-complete);
-}
+/* Remove old per-state nav backgrounds to prevent conflicts */
+.slds-path__nav .slds-is-complete,
 .slds-path__nav .slds-is-incomplete {
-  background: var(--path-color-incomplete);
+  background: transparent !important;
 }
