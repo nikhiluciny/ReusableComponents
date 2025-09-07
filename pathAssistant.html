@@ -40,7 +40,10 @@
                                         <template for:each={steps} for:item="step">
                                             <li key={step.value}
                                                 class={step.classText}
-                                                role="presentation">
+                                                role="presentation"
+                                                data-index={step.index}
+                                                onmouseenter={handleStepHoverEnter}
+                                                onmouseleave={handleStepHoverLeave}>
                                                 <a aria-selected="false"
                                                    class="slds-path__link"
                                                    href="javascript:void(0);"
@@ -59,6 +62,7 @@
                                 </div>
                             </div>
                         </div>
+
                         <div lwc:if={displayUpdateButton} class="slds-grid slds-path__action">
                             <template lwc:if={isLoaded}>
                                 <!-- button disabled  -->
